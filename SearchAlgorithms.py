@@ -24,8 +24,7 @@ def reconstruct_path(g: Graph, sc: pygame.Surface, father: list[int]):
             break
 
         curr, parent = g.grid_cells[i], g.grid_cells[father[i]]
-        curr_coordinate, parent_coordinate = (
-            curr.x, curr.y), (parent.x, parent.y)
+        curr_coordinate, parent_coordinate = (curr.x, curr.y), (parent.x, parent.y)
 
         pygame.draw.line(sc, green, curr_coordinate, parent_coordinate, 2)
         set_color(sc, curr, grey)
@@ -43,8 +42,7 @@ def DFS(g: Graph, sc: pygame.Surface):
 
         if g.is_goal(curr):
             break
-
-        if curr.value in closed_set:
+        elif curr.value in closed_set:
             continue
         else:
             closed_set.append(curr.value)
@@ -56,12 +54,12 @@ def DFS(g: Graph, sc: pygame.Surface):
                 set_color(sc, child, red)
 
                 father[child.value] = curr.value
-
+                
     reconstruct_path(g, sc, father)
 
 
 def BFS(g: Graph, sc: pygame.Surface):
-    open_set = [g.start.value]
+    open_set: list[int] = [g.start.value]
     closed_set = []
     father = [-1]*g.get_len()
 
@@ -79,13 +77,13 @@ def BFS(g: Graph, sc: pygame.Surface):
             set_color(sc, curr, blue)
 
         for child in g.get_neighbors(curr):
-            if child.value not in closed_set:
+            if child.value not in closed_set and child.value not in open_set:
                 open_set.append(child.value)
                 set_color(sc, child, red)
-
                 father[child.value] = curr.value
-
+                
     reconstruct_path(g, sc, father)
+
 
 def get_min_node(open_set: dict[int]):
     min = 100_000
@@ -95,9 +93,11 @@ def get_min_node(open_set: dict[int]):
             min = v
             min_node = i
     return min_node
-    
+
+
 def get_distance(curr: Node, goal: Node):
     return math.sqrt((curr.x - goal.x)**2 + (curr.y - goal.y)**2)
+
 
 def UCS(g: Graph, sc: pygame.Surface):
     open_set = {}
@@ -112,16 +112,15 @@ def UCS(g: Graph, sc: pygame.Surface):
         curr = g.grid_cells[min_node]
         del open_set[min_node]
         set_color(sc, curr, yellow)
-        
+
         if g.is_goal(curr):
             break
-        
-        if curr.value in closed_set:
+        elif curr.value in closed_set:
             continue
         else:
             closed_set.append(curr.value)
             set_color(sc, curr, blue)
-        
+
         for child in g.get_neighbors(curr):
             if child.value not in closed_set and child.value not in open_set.keys():
                 cost[child.value] = cost[curr.value] + get_distance(curr, child)
@@ -131,14 +130,16 @@ def UCS(g: Graph, sc: pygame.Surface):
             elif child.value in open_set.keys() and cost[child.value] < open_set[child.value]:
                 open_set[child.value] = cost[child.value]
 
-
     reconstruct_path(g, sc, father)
+
 
 def mahattan_heurisitc(curr: Node, goal: Node):
     return abs(curr.x - goal.x) + abs(curr.y - goal.y)
 
+
 def euclidean_heuristic(curr: Node, goal: Node):
     return math.sqrt((curr.x - goal.x)**2 + (curr.y - goal.y)**2)
+
 
 def AStar(g: Graph, sc: pygame.Surface):
 
@@ -154,16 +155,16 @@ def AStar(g: Graph, sc: pygame.Surface):
         curr = g.grid_cells[min_node]
         del open_set[min_node]
         set_color(sc, curr, yellow)
-        
+
         if g.is_goal(curr):
             break
-        
+
         if curr.value in closed_set:
             continue
         else:
             closed_set.append(curr.value)
             set_color(sc, curr, blue)
-        
+
         for child in g.get_neighbors(curr):
             new_cost = cost[curr.value] + get_distance(curr, child)
             if new_cost < cost[child.value]:
