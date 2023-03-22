@@ -1,7 +1,7 @@
 from Space import *
 from Constants import *
 import time
-import random
+import math
 
 
 def set_color(sc: pygame.Surface, node: Node, color):
@@ -95,7 +95,9 @@ def get_min_node(open_set: dict[int]):
             min = v
             min_node = i
     return min_node
-        
+    
+def get_distance(curr: Node, goal: Node):
+    return math.sqrt((curr.x - goal.x)**2 + (curr.y - goal.y)**2)
 
 def UCS(g: Graph, sc: pygame.Surface):
     open_set = {}
@@ -123,7 +125,7 @@ def UCS(g: Graph, sc: pygame.Surface):
         for child in g.get_neighbors(curr):
             if child.value not in closed_set and child.value not in open_set.keys():
                 # chi phí giữa các đỉnh là bao nhiêu?
-                cost[child.value] = cost[curr.value] + random.randint(1, 10)
+                cost[child.value] = cost[curr.value] + get_distance(curr, child)
                 open_set[child.value] = cost[child.value]
                 set_color(sc, child, red)
                 father[child.value] = curr.value
