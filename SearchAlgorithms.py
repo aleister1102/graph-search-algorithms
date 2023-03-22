@@ -124,7 +124,6 @@ def UCS(g: Graph, sc: pygame.Surface):
         
         for child in g.get_neighbors(curr):
             if child.value not in closed_set and child.value not in open_set.keys():
-                # chi phí giữa các đỉnh là bao nhiêu?
                 cost[child.value] = cost[curr.value] + get_distance(curr, child)
                 open_set[child.value] = cost[child.value]
                 set_color(sc, child, red)
@@ -135,9 +134,13 @@ def UCS(g: Graph, sc: pygame.Surface):
 
     reconstruct_path(g, sc, father)
 
+def mahattan_heurisitc(curr: Node, goal: Node):
+    return abs(curr.x - goal.x) + abs(curr.y - goal.y)
+
+def euclidean_heuristic(curr: Node, goal: Node):
+    return math.sqrt((curr.x - goal.x)**2 + (curr.y - goal.y)**2)
 
 def AStar(g: Graph, sc: pygame.Surface):
-    print('Implement A* algorithm')
 
     open_set = {}
     open_set[g.start.value] = 0
@@ -146,5 +149,29 @@ def AStar(g: Graph, sc: pygame.Surface):
     cost = [100_000]*g.get_len()
     cost[g.start.value] = 0
 
-    # TODO: Implement A* algorithm using open_set, closed_set, and father
-    raise NotImplementedError('Not implemented')
+    while len(open_set):
+        min_node = get_min_node(open_set)
+        curr = g.grid_cells[min_node]
+        del open_set[min_node]
+        set_color(sc, curr, yellow)
+        
+        if g.is_goal(curr):
+            break
+        
+        if curr.value in closed_set:
+            continue
+        else:
+            closed_set.append(curr.value)
+            set_color(sc, curr, blue)
+        
+        for child in g.get_neighbors(curr):
+            new_cost = cost[curr.value] + get_distance(curr, child)
+            if new_cost < cost[child.value]:
+                father[child.value] = curr.value
+                cost[child.value] = new_cost
+                f = cost[child.value] + mahattan_heurisitc(child, g.goal)
+                if child.value not in open_set.keys():
+                    open_set[child.value] = f
+                    set_color(sc, child, red)
+
+    reconstruct_path(g, sc, father)
