@@ -4,7 +4,7 @@ import argparse
 
 def main(algo: str, start_pos: int, goal_pos: int):
     pygame.init()
-    pygame.display.set_caption(f'<your name goes here> - {algo}')
+    pygame.display.set_caption(f'20120356 - Lê Minh Quân - {algo}')
     sc = pygame.display.set_mode(RES)
     clock = pygame.time.Clock()
     sc.fill(pygame.color.Color('black'))
